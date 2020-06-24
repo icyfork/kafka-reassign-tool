@@ -6,8 +6,8 @@ require 'open3'
 require 'tempfile'
 require 'optparse'
 
-DEFAULT_KAFKA_ROOT='/opt/kafka'
-DEFAULT_KAFKA_CONFIG='/config/server.properties'
+DEFAULT_KAFKA_ROOT='/etc/kafka'
+DEFAULT_KAFKA_CONFIG='server.properties'
 
 $kafka_root = nil
 $zookeeper_url = nil
