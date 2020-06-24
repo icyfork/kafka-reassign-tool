@@ -7,7 +7,7 @@ require 'tempfile'
 require 'optparse'
 
 DEFAULT_KAFKA_ROOT='/etc/kafka'
-DEFAULT_KAFKA_CONFIG='server.properties'
+DEFAULT_KAFKA_CONFIG='/etc/kafka/kafka.properties'
 
 $kafka_root = nil
 $zookeeper_url = nil
@@ -48,7 +48,7 @@ end
 def get_zk_url()
   return $zookeeper_url if $zookeeper_url
 
-  config_file = get_kafka_root + DEFAULT_KAFKA_CONFIG
+  config_file = DEFAULT_KAFKA_CONFIG
 
   if File.file? config_file then
     puts "Reading #{config_file}"
@@ -69,7 +69,7 @@ def get_zk_url()
 end
 
 def get_brokers()
-    result = run(get_kafka_root + '/bin/zookeeper-shell.sh', [get_zk_url], {:input => 'ls /brokers/ids'})
+    result = run('/usr/bin/zookeeper-shell.sh', [get_zk_url], {:input => 'ls /brokers/ids'})
 
     # Look for a line
     #   [1003, 1001, 1002]
@@ -85,7 +85,7 @@ def get_brokers()
 end
 
 def get_topics()
-    result = run(get_kafka_root + '/bin/kafka-topics.sh', [
+    result = run('/usr/bin/kafka-topics.sh', [
                  '--zookeeper', get_zk_url,
                  '--list'
                 ])
@@ -115,7 +115,7 @@ def get_current_assignments(topics, brokers)
   topics_file << topics_json(topics)
   topics_file.close
 
-  result = run(get_kafka_root + '/bin/kafka-reassign-partitions.sh', [
+  result = run('/usr/bin/kafka-reassign-partitions.sh', [
                '--zookeeper', get_zk_url,
                '--topics-to-move-json-file', topics_file.path,
                '--broker-list', brokers.join(','),
@@ -374,9 +374,9 @@ else
   }
   puts "Done"
   puts "To apply, run:"
-  puts "  #{get_kafka_root + '/bin/kafka-reassign-partitions.sh'} --zookeeper #{zk_url} --reassignment-json-file new-assignments.json --execute --throttle XXXXXXXX"
+  puts "  #{'/usr/bin/kafka-reassign-partitions.sh'} --zookeeper #{zk_url} --reassignment-json-file new-assignments.json --execute --throttle XXXXXXXX"
   puts "Then verify with:"
-  puts "  #{get_kafka_root + '/bin/kafka-reassign-partitions.sh'} --zookeeper #{zk_url} --reassignment-json-file new-assignments.json --verify"
+  puts "  #{'/usr/bin/kafka-reassign-partitions.sh'} --zookeeper #{zk_url} --reassignment-json-file new-assignments.json --verify"
   puts
 end
 
